@@ -1,0 +1,12 @@
+# Exclude any colors.h that may exist under PDCurses/wincon
+PDCurses/wincon/colors.h
+
+# Common Windows build clutter (optional)
+*.pdb
+*.ilk
+*.obj
+*.lib
+*.exp
+*.log
+Thumbs.db
+Desktop.ini
