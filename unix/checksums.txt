@@ -1,0 +1,12 @@
+# Checksums for snake-unix executable
+# Generated on October 28, 2025
+
+File: unix/snake-unix
+Size: 1228424 bytes
+
+MD5:    3735302422297850d13a6d1c57871d08
+SHA256: ee1308383aebab5c25fcc98148204c2af6d101f29160e0491a9ffdac78b43c62
+
+# To verify integrity, run:
+# md5sum unix/snake-unix
+# sha256sum unix/snake-unix
