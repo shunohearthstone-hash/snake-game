@@ -28,7 +28,7 @@ int init_colors(void) {
     init_pair(COLOR_BORDER,        COLOR_WHITE,    COLOR_BLACK);
     init_pair(COLOR_TEXT,          COLOR_WHITE,    COLOR_BLACK);
     init_pair(COLOR_ERROR,         COLOR_RED,      COLOR_BLACK);
-    init_pair(COLOR_SUCCESS,       COLOR_GREEN,    COLOR_BLACK);
+    init_pair(COLOR_SUCCESS,       COLOR_WHITE,    COLOR_BLACK);
     init_pair(COLOR_WARNING,       COLOR_YELLOW,   COLOR_BLACK);
     init_pair(COLOR_DEATH_ITEM,    COLOR_RED,      COLOR_BLACK);
 
