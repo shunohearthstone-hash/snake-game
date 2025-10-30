@@ -21,8 +21,8 @@ int init_colors(void) {
     // Initialize pairs. Choose contrasting, readable defaults.
     // Fallback if COLOR_ constants are limited in some terminals.
     init_pair(COLOR_SNAKE_HEAD,    COLOR_YELLOW,   COLOR_BLACK);
-    init_pair(COLOR_SNAKE_BODY,    COLOR_GREEN,    COLOR_BLACK);
-    init_pair(COLOR_FOOD,          COLOR_BLUE,      COLOR_BLACK);
+    init_pair(COLOR_SNAKE_BODY,    COLOR_WHITE,    COLOR_BLACK);
+    init_pair(COLOR_FOOD,          COLOR_GREEN,      COLOR_BLACK);
     init_pair(COLOR_TEMP_FOOD,     COLOR_CYAN,     COLOR_BLACK);
     init_pair(COLOR_SPECIAL_ITEM,  COLOR_MAGENTA,  COLOR_BLACK);
     init_pair(COLOR_BORDER,        COLOR_WHITE,    COLOR_BLACK);
