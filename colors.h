@@ -2,7 +2,7 @@
 #define COLORS_H
 
 #ifdef _WIN32
-    #include <pdcurses/curses.h>  // PDCurses for Windows
+    #include "PDCurses/curses.h"  // Use local PDCurses headers on Windows
 #else
     #include <ncurses.h> // ncurses for Linux/Mac
 #endif

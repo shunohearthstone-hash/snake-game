@@ -5,7 +5,7 @@
     #define NOMINMAX
     #include <windows.h>
     #define usleep(x) Sleep((x)/1000)  // Convert microseconds to milliseconds
-    #include <pdcurses/curses.h>  // PDCurses
+    #include "PDCurses/curses.h"  // Use local PDCurses headers
 #else
     #include <unistd.h>
     #include <ncurses.h> // Linux/Mac
