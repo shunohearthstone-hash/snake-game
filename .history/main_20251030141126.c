@@ -4,7 +4,7 @@
 #ifdef _WIN32
     #define NOMINMAX
     #include <windows.h>
-    #define usleep(x) Sleep((x)/1000)  // Convert microseconds to milliseconds
+    #define usleep(x) Sleep((x)/1000.0f)  // Convert microseconds to milliseconds
     #include <pdcurses/curses.h>  // PDCurses
 #else
     #include <unistd.h>
@@ -19,19 +19,14 @@
 #define MAX_SNAKE_LEN (ROWS * COLS)
 #define MAX_FOOD 5
 #define MAX_TEMP_FOOD 3
-#define TEMP_FOOD_DURATION 500  // frames before temp food disappears
+#define TEMP_FOOD_DURATION 100  // frames before temp food disappears
 #define DELAY 10000.0f  // microseconds per frame (lower = faster) - reduced for responsive input
-#define MOVEMENT_FRAME_INTERVAL 10  // Snake moves every N frames
+#define MOVEMENT_FRAME_INTERVAL 8  // Snake moves every N frames
 #define MAX_DEATH_ITEMS 4
 
 
 // Directions
-typedef enum {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT
-} Direction;
+enum { UP, DOWN, LEFT, RIGHT };
 
 typedef struct {
     int x;
@@ -41,7 +36,7 @@ typedef struct {
 typedef struct {
     Point pos;
     int timeLeft;
-    //int blinkCounter;
+    int blinkCounter;
     int foodType;    // 0=normal, 1=double points, 2=triple points
     char symbol;     // Different symbols for different types
 } TempFood;
@@ -189,18 +184,18 @@ void placeTempFood() {
         if (typeRoll < 70) {
             tempFood[tempFoodCount].foodType = 0;
             tempFood[tempFoodCount].symbol = 'T';
-            tempFood[tempFoodCount].timeLeft = 800; // 800 frames
+            tempFood[tempFoodCount].timeLeft = 80 + (rand() % 41); // 80-120 frames
         } else if (typeRoll < 90) {
             tempFood[tempFoodCount].foodType = 1;
             tempFood[tempFoodCount].symbol = 'D';
-            tempFood[tempFoodCount].timeLeft = 600; // 600 frames
+            tempFood[tempFoodCount].timeLeft = 60 + (rand() % 31); // 60-90 frames
         } else {
             tempFood[tempFoodCount].foodType = 2;
             tempFood[tempFoodCount].symbol = 'X';
-            tempFood[tempFoodCount].timeLeft = 400; // 400 frames
+            tempFood[tempFoodCount].timeLeft = 40 + (rand() % 21); // 40-60 frames
         }
         
-        //tempFood[tempFoodCount].blinkCounter = rand() % 5;
+        tempFood[tempFoodCount].blinkCounter = rand() % 5;
         tempFoodCount++;
     }
 }
@@ -297,8 +292,6 @@ void moveSnake() {
         }
         foodCount--;
         
-        //int score = snake.length - 3; // Calculate score here when food is eaten
-        
         // Double points during speed boost
         int growthAmount = speedBoostActive ? 2 : 1;
         
@@ -351,9 +344,9 @@ void moveSnake() {
         // Add regular food as reward
         placeFood();
         
-        // Activate speed boost for 750 frames with double scoring
+        // Activate speed boost for 150 frames with double scoring
         speedBoostActive = 1;
-        speedBoostTimer = 750;
+        speedBoostTimer = 150;
     }
 }
 /* ------------------ END OF FUNCTIONS ------------------*/
@@ -420,22 +413,26 @@ void drawBoard() {
         mvwaddch(gameWin, food[i].y + 1, food[i].x + 1, '*');
     }
     remove_all_colors(gameWin);
-    // Draw temporary food with different colors
+    // Draw blinking temporary food with different colors
     for (int i = 0; i < tempFoodCount; i++) {
-        // Different colors for different types
-        switch (tempFood[i].foodType) {
-            case 0: // Normal - magenta
-                apply_temp_food_color(gameWin);
-                break;
-            case 1: // Double - yellow
-                apply_warning_color(gameWin);
-                break;
-            case 2: // Triple - green
-                apply_success_color(gameWin);
-                break;
+        // Blink effect: visible 80% of the time (8 frames visible, 2 frames hidden)
+        int blinkCycle = tempFood[i].blinkCounter % 10;
+        if (blinkCycle < 8) {  // Visible for first 8 frames of 10-frame cycle
+            // Different colors for different types
+            switch (tempFood[i].foodType) {
+                case 0: // Normal - magenta
+                    apply_temp_food_color(gameWin);
+                    break;
+                case 1: // Double - yellow
+                    apply_warning_color(gameWin);
+                    break;
+                case 2: // Triple - green
+                    apply_success_color(gameWin);
+                    break;
+            }
+            mvwaddch(gameWin, tempFood[i].pos.y + 1, tempFood[i].pos.x + 1, tempFood[i].symbol);
+            remove_all_colors(gameWin);
         }
-        mvwaddch(gameWin, tempFood[i].pos.y + 1, tempFood[i].pos.x + 1, tempFood[i].symbol);
-        remove_all_colors(gameWin);
     }
     apply_special_item_color(gameWin);
     if (specialItem.active) {
@@ -478,7 +475,7 @@ void drawBoard() {
 /* ------------------ END OF GAME WINDOW FUNCTIONS ------------------ */
 void changeDirection(int input) {
     // Check against current direction to prevent 180-degree turns
-    Direction newDir = nextDirection;  // Start with buffered direction
+    int newDir = nextDirection;  // Start with buffered direction
     
     switch (input) {
         case 'W': case 'w': 
@@ -502,7 +499,7 @@ void changeDirection(int input) {
 void updateTempFood() {
     for (int i = 0; i < tempFoodCount; i++) {
         tempFood[i].timeLeft--;
-        //tempFood[i].blinkCounter++;
+        tempFood[i].blinkCounter++;
         
         // Remove expired temp food
         if (tempFood[i].timeLeft <= 0) {
@@ -649,15 +646,18 @@ void trySpawnDeathItem() {
     }
 }
 int main() {
-    
-    srand(time(NULL));
-    initscr();
-    cbreak();
-    noecho();
-    nodelay(stdscr, TRUE);
-    curs_set(0);
-    keypad(stdscr, TRUE);
-     if (!init_colors()) {
+    #ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    SetConsoleCP(CP_UTF8);
+    #endif
+        srand(time(NULL));
+        initscr();
+        cbreak();
+        noecho();
+        nodelay(stdscr, TRUE);
+        curs_set(0);
+        keypad(stdscr, TRUE);
+            if (!init_colors()) {
         printw("Colors not supported on this terminal\n");
         refresh();
         getch();

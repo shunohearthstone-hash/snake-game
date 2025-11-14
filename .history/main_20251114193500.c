@@ -21,7 +21,7 @@
 #define MAX_TEMP_FOOD 3
 #define TEMP_FOOD_DURATION 500  // frames before temp food disappears
 #define DELAY 10000.0f  // microseconds per frame (lower = faster) - reduced for responsive input
-#define MOVEMENT_FRAME_INTERVAL 10  // Snake moves every N frames
+#define MOVEMENT_FRAME_INTERVAL 8  // Snake moves every N frames
 #define MAX_DEATH_ITEMS 4
 
 
@@ -41,7 +41,7 @@ typedef struct {
 typedef struct {
     Point pos;
     int timeLeft;
-    //int blinkCounter;
+    int blinkCounter;
     int foodType;    // 0=normal, 1=double points, 2=triple points
     char symbol;     // Different symbols for different types
 } TempFood;
@@ -200,7 +200,7 @@ void placeTempFood() {
             tempFood[tempFoodCount].timeLeft = 400; // 400 frames
         }
         
-        //tempFood[tempFoodCount].blinkCounter = rand() % 5;
+        tempFood[tempFoodCount].blinkCounter = rand() % 5;
         tempFoodCount++;
     }
 }
@@ -297,7 +297,7 @@ void moveSnake() {
         }
         foodCount--;
         
-        //int score = snake.length - 3; // Calculate score here when food is eaten
+        int score = snake.length - 3; // Calculate score here when food is eaten
         
         // Double points during speed boost
         int growthAmount = speedBoostActive ? 2 : 1;
@@ -502,7 +502,7 @@ void changeDirection(int input) {
 void updateTempFood() {
     for (int i = 0; i < tempFoodCount; i++) {
         tempFood[i].timeLeft--;
-        //tempFood[i].blinkCounter++;
+        tempFood[i].blinkCounter++;
         
         // Remove expired temp food
         if (tempFood[i].timeLeft <= 0) {
